@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/structs"
 	"github.com/linkedin/goavro/v2"
 	_ "github.com/linkedin/goavro/v2"
+	"io/ioutil"
 )
 
 //go:generate mockgen -source=interface.go -destination=mocks/mock_interface.go -package=mock_gox_aws_avro
@@ -45,4 +46,12 @@ func NewAvroSchemaEngine(schema string) (SchemaEngine, error) {
 		return nil, errors2.Wrap(err, "input avro schema is not valid")
 	}
 	return &schemaEngine{codec: codec}, nil
+}
+
+func NewAvroSchemaEngineWithFile(schemaFile string) (SchemaEngine, error) {
+	data, err := ioutil.ReadFile(schemaFile)
+	if err != nil {
+		return nil, errors2.Wrap(err, "file not found: %s", schemaFile)
+	}
+	return NewAvroSchemaEngine(string(data))
 }

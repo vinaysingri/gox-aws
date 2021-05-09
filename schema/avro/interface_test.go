@@ -130,3 +130,20 @@ func TestAvroEngine_Versioning(t *testing.T) {
 	// but it should not see the new values
 	assert.Equal(t, "", backObject.StringOrEmpty("Dob"))
 }
+
+func TestAvroEngineWithFile(t *testing.T) {
+	engine, err := NewAvroSchemaEngineWithFile("test_avro_schema.json")
+	assert.NoError(t, err)
+
+	// Create Avro binary data - This data can be sent over wire e.g. over kafka
+	obj := Employee{Name: "user", Age: 10}
+	data, err := engine.ToAvro(obj)
+	assert.NoError(t, err)
+	assert.NotNil(t, data)
+
+	// Get back data from Avro to original - We have our data back as a map
+	backObject, err := engine.FromAvro(data)
+	assert.NoError(t, err)
+	assert.Equal(t, obj.Name, backObject.StringOrEmpty("Name"))
+	assert.Equal(t, obj.Age, backObject.IntOrDefault("Age", 0))
+}

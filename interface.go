@@ -1,4 +1,4 @@
-package goxaws
+package gox_aws
 
 import "github.com/aws/aws-sdk-go/aws/session"
 

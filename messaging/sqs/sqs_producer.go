@@ -4,10 +4,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	goxAws "github.com/devlibx/gox-aws"
-	"github.com/devlibx/gox-aws/messaging"
 	"github.com/devlibx/gox-base"
 	errors2 "github.com/devlibx/gox-base/errors"
 	"github.com/devlibx/gox-base/serialization"
+	"github.com/devlibx/gox-messaging"
 	"go.uber.org/zap"
 )
 
@@ -20,6 +20,10 @@ type sqsProducer struct {
 	sqs    *sqs.SQS
 	config Config
 	gox.CrossFunction
+}
+
+func (s *sqsProducer) Stop() error {
+	return nil
 }
 
 func (s *sqsProducer) Send(request *messaging.Event) (response *messaging.Response, err error) {

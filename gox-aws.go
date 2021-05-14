@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/devlibx/gox-base"
 	errors2 "github.com/devlibx/gox-base/errors"
+	"github.com/devlibx/gox-base/util"
 )
 
 type awsSessionContext struct {
@@ -16,8 +17,13 @@ func (a *awsSessionContext) GetSession() *session.Session {
 	return a.session
 }
 
-func NewAwsContext(config Config) (ctx AwsContext, err error) {
-	_ctx := &awsSessionContext{CrossFunction: gox.NewNoOpCrossFunction()}
+func NewAwsContext(cf gox.CrossFunction, config Config) (ctx AwsContext, err error) {
+	_ctx := &awsSessionContext{CrossFunction: cf}
+
+	// Set default region
+	if util.IsStringEmpty(config.Region) {
+		config.Region = "ap-south-1"
+	}
 
 	// Setup AWS session
 	if len(config.Endpoint) > 0 {

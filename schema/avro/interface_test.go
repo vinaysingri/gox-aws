@@ -1,6 +1,7 @@
 package avro
 
 import (
+	"flag"
 	mockAwsAvro "github.com/devlibx/gox-aws/schema/avro/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -10,6 +11,11 @@ import (
 type Employee struct {
 	Name string
 	Age  int
+}
+
+func init() {
+	ignore := ""
+	flag.StringVar(&ignore, "real.sqs.queue", "false", "run all database tests for dynamo")
 }
 
 func TestAvroEngine(t *testing.T) {

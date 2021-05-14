@@ -12,7 +12,8 @@ import (
 )
 
 type Config struct {
-	QueueUrl string
+	QueueUrl         string
+	EventConcurrency int
 }
 
 type sqsProducer struct {

@@ -18,7 +18,7 @@ type sqsConsumer struct {
 }
 
 func (s *sqsConsumer) readEvents(ctx context.Context) chan messaging.Event {
-	readChannel := make(chan messaging.Event, 1000)
+	readChannel := make(chan messaging.Event, s.config.EventConcurrency)
 	go func() {
 		for {
 
@@ -56,7 +56,7 @@ func (s *sqsConsumer) readEvents(ctx context.Context) chan messaging.Event {
 }
 
 func (s *sqsConsumer) Process(ctx context.Context, messagePressedAckChannel chan messaging.Event) (chan messaging.Event, error) {
-	eventChannel := make(chan messaging.Event, 1000)
+	eventChannel := make(chan messaging.Event, s.config.EventConcurrency)
 
 	go func() {
 		// Read messages from SQS
@@ -109,9 +109,11 @@ func (s *sqsConsumer) Process(ctx context.Context, messagePressedAckChannel chan
 }
 
 func NewSqsConsumer(cf gox.CrossFunction, ctx goxAws.AwsContext, config Config) messaging.Consumer {
-	queue := sqs.New(ctx.GetSession())
+	if config.EventConcurrency < 0 {
+		config.EventConcurrency = 100
+	}
 	return &sqsConsumer{
-		sqs:           queue,
+		sqs:           sqs.New(ctx.GetSession()),
 		config:        config,
 		CrossFunction: cf,
 	}

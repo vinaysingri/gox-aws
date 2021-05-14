@@ -37,6 +37,8 @@ func (s *sqsProducer) Send(request *messaging.Event) (response *messaging.Respon
 	})
 	if err != nil {
 		return nil, errors2.Wrap(err, "failed to send sqs event: request=%v, out=%v", request, out)
+	} else {
+		// s.Logger().Debug("message send", zap.Any("message", request))
 	}
 
 	return &messaging.Response{RawPayload: out}, nil

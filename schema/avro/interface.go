@@ -22,6 +22,8 @@ type schemaEngine struct {
 func (e *schemaEngine) ToAvro(data interface{}) ([]byte, error) {
 	if _, ok := data.(map[string]interface{}); ok {
 		return e.codec.BinaryFromNative(nil, data)
+	} else if _data, ok := data.(gox.StringObjectMap); ok {
+		return e.codec.BinaryFromNative(nil, map[string]interface{}(_data))
 	} else {
 		return e.codec.BinaryFromNative(nil, structs.Map(data))
 	}

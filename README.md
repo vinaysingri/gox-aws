@@ -1,7 +1,7 @@
 #### Schema
 
 This example shows how to use a schema and convert a golang struct to Avro byte data. Then convert
-it back from Avro byte data to original object. 
+it back from Avro byte data to original object.  
 
 ```go
 func TestAvroEngine(t *testing.T) {

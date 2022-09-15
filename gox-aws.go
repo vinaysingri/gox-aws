@@ -19,25 +19,42 @@ func (a *awsSessionContext) GetSession() *session.Session {
 
 func NewAwsContext(cf gox.CrossFunction, config Config) (ctx AwsContext, err error) {
 	_ctx := &awsSessionContext{CrossFunction: cf}
+	var region *string
+	var endpoint *string
+	var creds *credentials.Credentials
 
 	// Set default region
 	if util.IsStringEmpty(config.Region) {
 		config.Region = "ap-south-1"
+	} else {
+		region = aws.String(config.Region)
 	}
 
-	// Setup AWS session
+	// use end point if configured
 	if len(config.Endpoint) > 0 {
-		_ctx.session, err = session.NewSession(
-			&aws.Config{
-				Region:   aws.String(config.Region),
-				Endpoint: aws.String(config.Endpoint),
-			})
+		endpoint = aws.String(config.Endpoint)
 	} else {
-		_ctx.session, err = session.NewSession(
-			&aws.Config{
-				Region: aws.String(config.Region),
-			})
+		endpoint = nil
 	}
+
+	// use credentials if configured
+	if !util.IsStringEmpty(config.AwsAccessKey) {
+		creds = credentials.NewStaticCredentials(
+			config.AwsAccessKey,
+			config.AwsSecretKey,
+			config.AwsSessionKey)
+
+	} else {
+		creds = nil
+	}
+
+	_ctx.session, err = session.NewSession(
+		&aws.Config{
+			Credentials: creds,
+			Region:      region,
+			Endpoint:    endpoint,
+		})
+
 	if err != nil {
 		return nil, errors2.Wrap(err, "failed to create aws session: endpoint=%s, region=%s", config.Endpoint, config.Region)
 	}
